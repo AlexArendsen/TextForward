@@ -1,0 +1,17 @@
+<resources>
+    <string name="app_name">TextForward</string>
+
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
+    <string name="title_activity_configure_server">ConfigureServerActivity</string>
+    <string name="server_address_label">Server IP Address</string>
+    <string name="server_port_label">Server Port</string>
+    <string name="server_save_button">Save Configuration</string>
+    <string name="textForwaredToggleLabel">Text Forwarding</string>
+    <string name="server_address_display_label">Server Address</string>
+
+    <string name="configure_server_button">Configure</string>
+    <string name="close_connection_button">Close</string>
+    <string name="test_connection_button">Test</string>
+    <string name="connection_block_label">Connection Options</string>
+</resources>
