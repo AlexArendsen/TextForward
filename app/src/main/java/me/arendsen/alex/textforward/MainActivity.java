@@ -1,6 +1,9 @@
 package me.arendsen.alex.textforward;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -12,37 +15,37 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
+import java.util.HashMap;
+
 public class MainActivity extends ActionBarActivity {
 
+    /* Constants */
     public static final int CONFIGURE_SERVER = 10;
     public static final String LOG_TAG = "TextForward";
 
-    TextView tvServerAddressDisplay;
-    Button bConfigureServer, bTestConnection;
-    ToggleButton tbForwardToggle;
-    boolean forwardingEnabled;
+    /* Fields */
+    private TextView tvServerAddressDisplay;
+    private Button bConfigureServer, bTestConnection;
+    private ToggleButton tbForwardToggle;
 
-    private class TextForwardSettings {
-        public String serverIP;
-        public int serverPort;
+    private boolean forwardingEnabled;
+    private TextForwardSettings serverSettings = new TextForwardSettings();
 
-        public TextForwardSettings() {
-            serverIP = "";
-            serverPort = -1;
-        }
+    private IntentFilter badgerMessageIntentFilter;
+    private BadgerMessageBroadcastReceiver badgerMessageReceiver = new BadgerMessageBroadcastReceiver();
 
-        public boolean isReady() {
-            return !serverIP.isEmpty() && serverIP!=null && serverPort>-1;
-        }
-    }
 
-    TextForwardSettings serverSettings = new TextForwardSettings();
-
+    /* Hook Overrides */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        Log.d(LOG_TAG,"onCreate");
+        Log.d(LOG_TAG, "onCreate");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        // Configure Badger Message Receiver
+        badgerMessageIntentFilter = new IntentFilter();
+        badgerMessageIntentFilter.addAction("BADGER_RECEIVED_ACTION");
+        registerReceiver(badgerMessageReceiver, badgerMessageIntentFilter);
 
         // Configure toggle button
         tbForwardToggle = (ToggleButton) findViewById(R.id.textForwardToggle);
@@ -60,6 +63,9 @@ public class MainActivity extends ActionBarActivity {
                     if(forwardingEnabled) {
                         serviceIntent.putExtra("serverIP",serverSettings.serverIP);
                         serviceIntent.putExtra("serverPort",serverSettings.serverPort);
+
+                        // TODO -- Add password input to interface
+                        serviceIntent.putExtra("password", "mypassword");
                         startService(serviceIntent);
                     } else {
                         stopService(serviceIntent);
@@ -122,6 +128,13 @@ public class MainActivity extends ActionBarActivity {
         }
     }
 
+    @Override
+    protected void onDestroy() {
+        unregisterReceiver(badgerMessageReceiver);
+        super.onDestroy();
+    }
+
+    /* Class Methods */
     private void updateServerField() {
         String serverIP = serverSettings.serverIP;
         String serverPort = ""+serverSettings.serverPort;
@@ -130,6 +143,7 @@ public class MainActivity extends ActionBarActivity {
 
     }
 
+    /* Menu initialization */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -150,5 +164,21 @@ public class MainActivity extends ActionBarActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+
+    /* Classes and Interfaces */
+    private class TextForwardSettings {
+        public String serverIP;
+        public int serverPort;
+
+        public TextForwardSettings() {
+            serverIP = "";
+            serverPort = -1;
+        }
+
+        public boolean isReady() {
+            return !serverIP.isEmpty() && serverIP!=null && serverPort>-1;
+        }
     }
 }

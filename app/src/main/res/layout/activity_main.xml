@@ -43,6 +43,12 @@
             android:text="@string/test_connection_button"
             android:id="@+id/testConnectionButton"/>
 
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/pushInboxButton"
+            android:text="@string/push_inbox_button" />
+
     </LinearLayout>
 
 
